@@ -24,6 +24,17 @@ if(NOT DEFINED USE_ARM)
   endif()
 endif()
 
+if(NOT DEFINED USE_PPC64LE)
+  execute_process(COMMAND /usr/bin/uname -m OUTPUT_VARIABLE processor)
+  if(processor MATCHES "^(ppc64le.*|PPC64LE.*)")
+    message("Detected ppc64le host. Setting USE_PPC64LE to true.")
+    set(USE_PPC64LE TRUE)
+  else()
+    message("Detected non-ppc64le host. Setting USE_PPC64LE to false.")
+    set(USE_PPC64LE FALSE)
+  endif()
+endif()
+
 project(pufferfish LANGUAGES CXX C)
 include(ExternalProject)
 
@@ -97,6 +108,11 @@ set(PF_CPP_FLAGS "-W;-Wall;-Wextra;-Wpointer-arith;-Wunused;-Wwrite-strings;-Wno
 if (USE_ARM)
     list(APPEND PF_CPP_FLAGS "-fsigned-char")
     add_compile_options(-fsigned-char)
+endif()
+
+if (USE_PPC64LE)
+    list(APPEND PF_CPP_FLAGS "-DNO_WARN_X86_INTRINSICS")
+    add_compile_definitions(NO_WARN_X86_INTRINSICS)
 endif()
 
 if (BUILD_PUFF_FOR_SALMON)
@@ -406,7 +422,7 @@ DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/seqlib
 SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/seqlib
 INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/install
 CONFIGURE_COMMAND ./configure 
-BUILD_COMMAND     make CXXFLAGS='-std=c++14' ${LIBSTADEN_LDFLAGS} ${LIBSTADEN_CFLAGS}
+BUILD_COMMAND     make CXXFLAGS=-std=c++14\ -DNO_WARN_X86_INTRINSICS ${LIBSTADEN_LDFLAGS} ${LIBSTADEN_CFLAGS} CFLAGS=-DNO_WARN_X86_INTRINSICS
 INSTALL_COMMAND   mkdir -p <INSTALL_DIR>/lib && mkdir -p <INSTALL_DIR>/include && cp src/libseqlib.a <INSTALL_DIR>/lib && 
                   cp htslib/libhts.a <INSTALL_DIR>/lib &&
                   cp -r SeqLib <INSTALL_DIR>/include &&

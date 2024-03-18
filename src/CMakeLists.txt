@@ -27,7 +27,7 @@ add_library(ksw2pp_sse2 OBJECT ${KSW2PP_ADVANCED_LIB_SRCS})
 add_library(ksw2pp_sse4 OBJECT ${KSW2PP_ADVANCED_LIB_SRCS})
 add_library(ksw2pp_basic OBJECT ${KSW2PP_BASIC_LIB_SRCS})
 
-if (USE_ARM)
+if (USE_ARM OR USE_PPC64LE)
     set_target_properties(ksw2pp_sse2 PROPERTIES COMPILE_FLAGS "-O3")
     set_target_properties(ksw2pp_sse2 PROPERTIES COMPILE_DEFINITIONS "__SSE2__;KSW_CPU_DISPATCH;KSW_USE_ARM;KSW_SSE2_ONLY;HAVE_KALLOC")
     set_target_properties(ksw2pp_sse4 PROPERTIES COMPILE_FLAGS "-O3")
